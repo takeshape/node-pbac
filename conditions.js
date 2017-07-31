@@ -11,69 +11,57 @@ const isEmpty = require('lodash/isEmpty');
 const forEach = require('lodash/forEach');
 const every = require('lodash/every');
 
+const equal = (a, b) => a === b;
+const notEqual = (a, b) => a !== b;
+const lessThan = (a, b) => a < b;
+const lessThanEqual = (a, b) => a <= b;
+const greaterThan = (a, b) => a > b;
+const greaterThanEqual = (a, b) => a >= b;
+
+function dateCondition(compare) {
+  return (a, b) => {
+    const timeA = Date.parse(a);
+    if (!timeA) {
+      return false;
+    }
+    const timeB = Date.parse(b);
+    if (!timeB) {
+      return false;
+    }
+    return compare(timeA, timeB);
+  };
+}
+
+function numericCondition(compare) {
+  return (a, b) => isNumber(a) && isNumber(b) && compare(a, b);
+}
+
+function stringLike(a, b) {
+  return new RegExp('^' +
+    b.replace(/[\-\[\]\/\{\}\(\)\+\.\\\^\$\|]/g, "\\$&")
+      .replace(/\*/g, '.*')
+      .replace(/\?/g, '.') + '$')
+    .test(a);
+}
 
 const conditions = {
-  NumericEquals(a, b) {
-    if (!isNumber(a) || !isNumber(b)) return false;
-    return a === b;
-  },
-  NumericNotEquals(a, b) {
-    if (!isNumber(a) || !isNumber(b)) return false;
-    return !this.conditions.NumericEquals.apply(this, arguments);
-  },
-  NumericLessThan(a, b) {
-    if (!isNumber(a) || !isNumber(b)) return false;
-    return a < b;
-  },
-  NumericGreaterThanEquals(a, b) {
-    if (!isNumber(a) || !isNumber(b)) return false;
-    return !this.conditions.NumericLessThan.apply(this, arguments);
-  },
-  NumericGreaterThan(a, b) {
-    if (!isNumber(a) || !isNumber(b)) return false;
-    return a > b;
-  },
-  NumericLessThanEquals(a, b) {
-    if (!isNumber(a) || !isNumber(b)) return false;
-    return !this.conditions.NumericGreaterThan.apply(this, arguments);
-  },
-  DateEquals(a, b) {
-    a = new Date(a), b = new Date(b);
-    if (a == 'Invalid Date' || b == 'Invalid Date') return false;
-    return a >= b && a <= b;
-  },
-  DateNotEquals(a, b) {
-    a = new Date(a), b = new Date(b);
-    if (a == 'Invalid Date' || b == 'Invalid Date') return false;
-    return !this.conditions.DateEquals.apply(this, arguments);
-  },
-  DateLessThan(a, b) {
-    a = new Date(a), b = new Date(b);
-    if (a == 'Invalid Date' || b == 'Invalid Date') return false;
-    return a < b;
-  },
-  DateGreaterThanEquals(a, b) {
-    a = new Date(a), b = new Date(b);
-    if (a == 'Invalid Date' || b == 'Invalid Date') return false;
-    return !this.conditions.DateLessThan.apply(this, arguments);
-  },
-  DateGreaterThan(a, b) {
-    a = new Date(a), b = new Date(b);
-    if (a == 'Invalid Date' || b == 'Invalid Date') return false;
-    return a > b;
-  },
-  DateLessThanEquals(a, b) {
-    a = new Date(a), b = new Date(b);
-    if (a == 'Invalid Date' || b == 'Invalid Date') return false;
-    return !this.conditions.DateGreaterThan.apply(this, arguments);
-  },
+  NumericEquals: numericCondition(equal),
+  NumericNotEquals: numericCondition(notEqual),
+  NumericLessThan: numericCondition(lessThan),
+  NumericGreaterThanEquals: numericCondition(greaterThanEqual),
+  NumericGreaterThan: numericCondition(greaterThan),
+  NumericLessThanEquals: numericCondition(lessThanEqual),
+  DateEquals: dateCondition(equal),
+  DateNotEquals: dateCondition(notEqual),
+  DateLessThan: dateCondition(lessThan),
+  DateGreaterThanEquals: dateCondition(greaterThanEqual),
+  DateGreaterThan: dateCondition(greaterThan),
+  DateLessThanEquals: dateCondition(lessThanEqual),
   BinaryEquals(a, b) {
-    if(!isString(b) || !(a instanceof Buffer)) return false;
-    return bufferEquals(a, new Buffer(b, 'base64'));
+    return isString(b) && a instanceof Buffer && bufferEquals(a, new Buffer(b, 'base64'));
   },
   BinaryNotEquals(a, b) {
-    if(!isString(b) || !(a instanceof Buffer)) return false;
-    return !bufferEquals(a, new Buffer(b, 'base64'));
+    return isString(b) && a instanceof Buffer && !bufferEquals(a, new Buffer(b, 'base64'));
   },
   /*
   ArnEquals
@@ -89,46 +77,35 @@ const conditions = {
     return ipcheck.match(a, b);
   },
   NotIpAddress() {
-    return !this.conditions.IpAddress.apply(this, arguments);
+    return !ipcheck.match(a, b);
   },
   StringEquals(a, b) {
-    if (!isString(a) || !isString(b)) return false;
-    return a === b;
+    return isString(a) && isString(b) && a === b;
   },
   StringNotEquals(a, b) {
-    if (!isString(a) || !isString(b)) return false;
-    return a !== b;
+    return isString(a) && isString(b) && a !== b;
   },
   StringEqualsIgnoreCase(a, b) {
-    if (!isString(a) || !isString(b)) return false;
-    return a.toLowerCase() === b.toLowerCase();
+    return isString(a) && isString(b) && a.toLowerCase() === b.toLowerCase();
   },
   StringNotEqualsIgnoreCase(a, b) {
-    if (!isString(a) || !isString(b)) return false;
-    return a.toLowerCase() !== b.toLowerCase();
+    return isString(a) && isString(b) && a.toLowerCase() !== b.toLowerCase();
+
   },
   StringLike(a, b) {
-    if (!isString(b)) return false;
-    return new RegExp('^' +
-        b.replace(/[\-\[\]\/\{\}\(\)\+\.\\\^\$\|]/g, "\\$&")
-        .replace(/\*/g, '.*')
-        .replace(/\?/g, '.') + '$')
-      .test(a);
+    return isString(b) && stringLike(a, b);
   },
   StringNotLike(a, b) {
-    if (!isString(b)) return false;
-    return !this.conditions.StringLike.apply(this, arguments);
+    return isString(b) && !stringLike(a, b);
   },
   Bool(a, b) {
-    if (!isBoolean(a) || !isBoolean(b)) return false;
-    return a === b;
+    return isBoolean(a) && isBoolean(b) && a === b;
   },
 };
 
 forEach(conditions, function(fn, condition) {
   conditions[condition + 'IfExists'] = function(a, b) {
-    if (isUndefined(a)) return true;
-    else return fn.apply(this, arguments);
+    return isUndefined(a) || fn.apply(this, arguments);
   };
   conditions['ForAllValues:' + condition] = function(a, b) {
     if (!isArray(a)) a = [a];
