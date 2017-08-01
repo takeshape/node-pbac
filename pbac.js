@@ -1,9 +1,9 @@
 'use strict';
 const conditions = require('./conditions');
+const ensureArray = require('./lib/ensure-array');
 
 const isPlainObject = require('lodash/isPlainObject');
 const isBoolean = require('lodash/isBoolean');
-const isArray = require('lodash/isArray');
 const isUndefined = require('lodash/isUndefined');
 const isEmpty = require('lodash/isEmpty');
 const forEach = require('lodash/forEach');
@@ -33,8 +33,7 @@ class PBAC {
   }
 
   add(policies) {
-    policies = isArray(policies) ? policies : [policies];
-    this.policies.push.apply(this.policies, policies);
+    this.policies.push.apply(this.policies, ensureArray(policies));
   }
 
   evaluate(options) {
@@ -109,8 +108,7 @@ class PBAC {
   }
 
   evaluateResource(resources, reference, variables) {
-    resources = isArray(resources) ? resources : [resources];
-    return resources.find(resource => {
+    return ensureArray(resources).find(resource => {
       const value = this.interpolateValue(resource, variables);
       return this.conditions.StringLike.call(this, reference, value);
     });
@@ -122,8 +120,7 @@ class PBAC {
     return every(Object.keys(condition), key => {
       const expression = condition[key];
       const variable = Object.keys(expression)[0];
-      let values = expression[variable];
-      values = isArray(values) ? values : [values];
+      const values = ensureArray(expression[variable]);
 
       let prefix;
       if (key.indexOf(':') !== -1) {
@@ -141,6 +138,5 @@ class PBAC {
 
 
 }
-
 
 module.exports = PBAC;
