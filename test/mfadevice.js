@@ -1,5 +1,5 @@
 var assert = require('assert'),
-  Engine = require('../pbac');
+  Engine = require('../src/pbac');
 
 var policies = require('./policies/mfadevice.json');
 

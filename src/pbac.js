@@ -1,6 +1,6 @@
 'use strict';
 const conditions = require('./conditions');
-const ensureArray = require('./lib/ensure-array');
+const ensureArray = require('./util/ensure-array');
 
 const isPlainObject = require('lodash/isPlainObject');
 const isBoolean = require('lodash/isBoolean');

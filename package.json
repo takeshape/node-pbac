@@ -8,10 +8,13 @@
     "z-schema": "^3.12.0"
   },
   "scripts": {
-    "test": "mocha --bail t/",
-    "docs": "cat output/intro.md LICENSE > README.md && doctoc --title Contents README.md"
+    "test": "mocha --bail test/",
+    "docs": "cat output/intro.md LICENSE > README.md && doctoc --title Contents README.md",
+    "build": "babel src --out-dir lib"
   },
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
     "doctoc": "^0.14.2",
     "jsdox": "^0.4.9",
     "mocha": "^2.2.5"
@@ -20,7 +23,7 @@
     "type": "git",
     "url": "monken/node-pbac"
   },
-  "main": "pbac.js",
+  "main": "lib/index.js",
   "author": "Moritz Onken <onken@netcubed.de>",
   "license": "MIT"
 }

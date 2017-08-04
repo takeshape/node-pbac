@@ -1,7 +1,7 @@
 var assert = require('assert'),
   _ = require('lodash');
 
-var conditions = require('../conditions');
+var conditions = require('../src/conditions');
 
 var tests = {
   StringLike: [

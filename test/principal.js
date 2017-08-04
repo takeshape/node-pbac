@@ -1,5 +1,5 @@
 var assert = require('assert'),
-  PBAC = require('../pbac');
+  PBAC = require('../src/pbac');
 
 var tests = [{
   name: 'Principal',

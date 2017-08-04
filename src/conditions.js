@@ -1,6 +1,6 @@
 'use strict';
 const ipcheck = require('ipcheck');
-const bufferEquals = require('./lib/bufferequals');
+const bufferEquals = require('./util/bufferequals');
 
 const isString = require('lodash/isString');
 const isBoolean = require('lodash/isBoolean');

@@ -1,4 +1,4 @@
-var Engine = require('../pbac');
+var Engine = require('../src/pbac');
 
 var policies = require('./policies/mfadevice.json');
 

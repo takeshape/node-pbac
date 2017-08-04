@@ -6,7 +6,7 @@ const PBAC = require('./pbac');
 
 const util = require('util');
 const forEach = require('lodash/forEach');
-const ensureArray = require('./lib/ensure-array');
+const ensureArray = require('./util/ensure-array');
 
 function throwError(name, message) {
   const args = [].slice.call(arguments, 2);
